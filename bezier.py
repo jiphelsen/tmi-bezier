@@ -82,7 +82,19 @@ class BezierCurveInteractive(FigureCanvas):
 
     def on_pick(self, event):
         if isinstance(event.artist, Circle):
-            self.dragging_point = event.artist
+            if event.mouseevent.button == 3:  
+                self.remove_point(event.artist)
+            elif event.mouseevent.button == 1: 
+                self.dragging_point = event.artist
+    def remove_point(self, circle):
+        if len(self.control_points) > 2:  
+            idx = self.control_circles.index(circle)
+            self.control_points = np.delete(self.control_points, idx, axis=0)
+
+            
+            self.control_circles.pop(idx).remove()
+            self.update_curve()
+
 
     def on_motion(self, event):
         if self.dragging_point is not None and event.xdata is not None and event.ydata is not None:
@@ -103,7 +115,7 @@ def main(n_points=4):
 
 
 if __name__ == "__main__":
-    POINTS = 2
+    POINTS = 6
     if len(sys.argv) > 1:
         try:
             n_points = int(sys.argv[1])
