@@ -12,12 +12,13 @@ from scipy.special import comb
 
 
 class BezierCurveInteractive(FigureCanvas):
+
     def __init__(self, n_points=4):
         self.fig, self.ax = plt.subplots()
         super().__init__(self.fig)
-
+        self.grid_size = 10
         self.n_points = n_points
-        self.control_points = np.random.rand(self.n_points, 2) * 10  # Random initial points
+        self.control_points = self.initialize_grid_points(self.n_points)
         self.dragging_point = None
 
         self.control_circles = [
@@ -45,6 +46,19 @@ class BezierCurveInteractive(FigureCanvas):
         self.ax.set_ylim(0, 10)
         self.ax.set_aspect("equal", adjustable="datalim")
         self.draw()
+
+    def initialize_grid_points(self, n_points):
+        grid_size = int(np.ceil(np.sqrt(n_points)))  
+        points = []
+        step = self.grid_size / (grid_size + 1)  
+        for i in range(n_points):
+            row = i // grid_size
+            col = i % grid_size
+            x = (col + 1) * step
+            y = (row + 1) * step
+            points.append([x, y])
+        return np.array(points)
+
 
     def bernstein_poly(self, i, n, t):
         return comb(n, i) * (t**i) * (1 - t) ** (n - i)
@@ -89,7 +103,7 @@ def main(n_points=4):
 
 
 if __name__ == "__main__":
-    POINTS = 4
+    POINTS = 2
     if len(sys.argv) > 1:
         try:
             n_points = int(sys.argv[1])
